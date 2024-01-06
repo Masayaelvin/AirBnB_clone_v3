@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+#comment
+
 """ Test .get() and .count() methods
 """
 from models import storage
