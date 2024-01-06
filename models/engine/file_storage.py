@@ -38,7 +38,6 @@ class FileStorage:
         for key, value in self.__objects.items():
             if value.__class__ == cls and value.id == id:
                 key = f"{value.__class__.__name__}.{id}"
-                print("key =", key)
                 return self.__objects[key]
 
     def count(self, cls=None):
