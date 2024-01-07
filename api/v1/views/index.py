@@ -3,7 +3,13 @@
 
 from api.v1.views import app_views
 from flask import jsonify
-
+from models import storage
+from models.state import State
+from models.place import Place
+from models.review import Review
+from models.user import User
+from models.amenity import Amenity
+from models.city import City
 
 @app_views.route("/status", methods=['GET'])
 def status():
@@ -15,15 +21,13 @@ def status():
 def stats():
     """defines the function to get the stats"""
 
-    amenities = storage.count("Amenities")
-    states = storage.count("States")
     stats = {
-            "amenities": amenities,
-            "cities": 36,
-            "places": 154,
-            "reviews": 718,
-            "states": states,
-            "users": 31
+            "amenities":storage.count(Amenity),
+            "cities": storage.count(City),
+            "places": storage.count(Place),
+            "reviews": storage.count(Review),
+            "states":  storage.count(State),
+            "users":  storage.count(User)
             }
 
     return jsonify(stats)
