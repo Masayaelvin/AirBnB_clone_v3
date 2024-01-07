@@ -1,7 +1,4 @@
 #!/usr/bin/python3
-"""
-Contains the FileStorage class
-"""
 
 import json
 from models.amenity import Amenity
@@ -11,6 +8,8 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+
+"""Contains the FileStorage class"""
 
 classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
@@ -34,6 +33,25 @@ class FileStorage:
             return new_dict
         return self.__objects
 
+    def get(self, cls, id):
+        """gets Item in storage depending on the id and class name"""
+        for key, value in self.__objects.items():
+            if value.__class__ == cls and value.id == id:
+                key = f"{value.__class__.__name__}.{id}"
+                return self.__objects[key]
+
+    def count(self, cls=None):
+        """counts the items in the data base"""
+        count = 0
+        if cls is not None:
+            for key, value in self.__objects.items():
+                if cls == value.__class__ or cls == value.__class__.__name__:
+                    count += 1
+        else:
+            for item in self.__objects:
+                count += 1
+        return count
+
     def new(self, obj):
         """sets in __objects the obj with key <obj class name>.id"""
         if obj is not None:
@@ -55,7 +73,7 @@ class FileStorage:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except:
+        except Exception:
             pass
 
     def delete(self, obj=None):
