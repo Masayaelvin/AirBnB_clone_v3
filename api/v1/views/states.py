@@ -8,13 +8,24 @@ from models.state import State
 import json
 
 
-@app_views.route("/states")
+@app_views.route("/states", methods = ['POST', 'GET'])
 def all_states():
-    """defines a function to retrieve all the states"""
+    """defines a function to retrieve all the states creates a new state"""
     states = storage.all(State)
-    state = [state.to_dict() for state in states.values()]
+    if request.method == 'GET':
+        state = [state.to_dict() for state in states.values()]
+        return jsonify(state)
 
-    return jsonify(state)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        if not data:
+            abort(400, 'Not a JSON')
+        if 'name' not in data:
+            abort(400, 'Missing name')
+        new_state = State(**data)
+        new_state.save()
+        return jsonify(new_state.to_dict()), 201
 
 
 @app_views.route("/states/<state_id>")
@@ -27,9 +38,9 @@ def state_by_id(state_id):
     return jsonify(state.to_dict())
 
 
-@app_views.route("/states/<state_id>", methods=['DELETE', 'POST', 'PUT'])
-def delete_update_create(state_id):
-    """creates, updates and deletes a state"""
+@app_views.route("/states/<state_id>", methods=['PUT', 'DELETE'])
+def delete_update(state_id):
+    """deletes or updates a state"""
     state = storage.get(State, state_id)
     if request.method == 'DELETE':
         if state is None:
@@ -37,15 +48,18 @@ def delete_update_create(state_id):
         else:
             storage.delete(state)
             storage.save()
-            return jsonify({}), 200
+            return {}, 200
 
-    elif request.method == 'POST':
+
+    elif request.method == 'PUT':
         data = request.get_json()
         if not data:
-            abort(404, "Not JSON format")
-        else:
-            for k, v in data.items():
-                if k not in ['id', 'created_at', 'updated_at']:
-                    setattr(State, k, v)
-                    state.save()
-            return jsonify(state.to_dict()), 200
+            abort(404, 'Not a JSON')
+        if 'name' not in data:
+            abort(400, 'Missing name')
+
+
+        new_state = State(**data)
+        new_state.save()
+        return jsonify(new_state.to_dict()), 201
+
