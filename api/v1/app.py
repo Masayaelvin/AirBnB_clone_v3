@@ -4,7 +4,7 @@
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
-
+import json
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
@@ -18,7 +18,7 @@ def close(error=None):
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({"error": "Not found"}), 404
+    return json.dumps({"error": "Not found"}, indent=2), 404
 
 
 if __name__ == "__main__":

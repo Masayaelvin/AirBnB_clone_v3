@@ -10,13 +10,14 @@ from models.review import Review
 from models.user import User
 from models.amenity import Amenity
 from models.city import City
+import json
 
 
 @app_views.route("/status", methods=['GET'])
 def status():
     """creates a route status"""
 
-    return jsonify({"status": "OK"})
+    return json.dumps({"status": "OK"}, indent=2)
 
 
 @app_views.route("/stats", methods=['GET'])
@@ -31,5 +32,6 @@ def stats():
             "states": storage.count(State),
             "users": storage.count(User)
             }
+    j_stats = json.dumps(stats, indent=2)
 
-    return jsonify(stats)
+    return j_stats
