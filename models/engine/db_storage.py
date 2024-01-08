@@ -54,13 +54,14 @@ class DBStorage:
     def get(self, cls, id):
         """gets Item depending in the given clas name and Id"""
         if cls is classes[cls.__name__]:
+            data = None
             objs = self.__session.query(classes[cls.__name__]).all()
             for obj in objs:
                 if obj.id == id:
                     data = self.__session.\
                             query(classes[cls.__name__]).\
                             filter_by(id=id).first()
-            return data
+                return data
         else:
             return None
 
