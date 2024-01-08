@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """registers the blue print and creates a flask instance"""
 
-from flask import Flask
+from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
 
