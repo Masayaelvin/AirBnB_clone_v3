@@ -11,23 +11,25 @@ from models.user import User
 from models.amenity import Amenity
 from models.city import City
 
+
 @app_views.route("/status", methods=['GET'])
 def status():
     """creates a route status"""
 
     return jsonify({"status": "OK"})
 
+
 @app_views.route("/stats", methods=['GET'])
 def stats():
     """defines the function to get the stats"""
 
     stats = {
-            "amenities":storage.count(Amenity),
+            "amenities": storage.count(Amenity),
             "cities": storage.count(City),
             "places": storage.count(Place),
             "reviews": storage.count(Review),
-            "states":  storage.count(State),
-            "users":  storage.count(User)
+            "states": storage.count(State),
+            "users": storage.count(User)
             }
 
     return jsonify(stats)
