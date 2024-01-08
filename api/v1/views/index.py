@@ -17,7 +17,7 @@ import json
 def status():
     """creates a route status"""
 
-    return json.dumps({"status": "OK"}, indent=2)
+    return jsonify({"status": "OK"})
 
 
 @app_views.route("/stats", methods=['GET'])
@@ -34,4 +34,4 @@ def stats():
             }
     j_stats = json.dumps(stats, indent=2)
 
-    return j_stats
+    return jsonify(stats)
