@@ -8,14 +8,13 @@ from models.state import State
 import json
 
 
-@app_views.route("/states", methods = ['POST', 'GET'])
+@app_views.route("/states", methods=['POST', 'GET'])
 def all_states():
     """defines a function to retrieve all the states creates a new state"""
     states = storage.all(State)
     if request.method == 'GET':
         state = [state.to_dict() for state in states.values()]
         return jsonify(state)
-
 
     elif request.method == 'POST':
         data = request.get_json()
@@ -50,7 +49,6 @@ def delete_update(state_id):
             storage.save()
             return {}, 200
 
-
     elif request.method == 'PUT':
         data = request.get_json()
         if not data:
@@ -58,8 +56,6 @@ def delete_update(state_id):
         if 'name' not in data:
             abort(400, 'Missing name')
 
-
         new_state = State(**data)
         new_state.save()
         return jsonify(new_state.to_dict()), 201
-
