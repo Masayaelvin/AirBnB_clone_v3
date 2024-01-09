@@ -35,9 +35,10 @@ class FileStorage:
 
     def get(self, cls, id):
         """gets Item in storage depending on the id and class name"""
+        ID = id
         for key, value in self.__objects.items():
-            if value.__class__ == cls and value.id == id:
-                key = f"{value.__class__.__name__}.{id}"
+            if value.__class__ == cls and value.id == ID:
+                key = f"{value.__class__.__name__}.{ID}"
                 return self.__objects[key]
 
     def count(self, cls=None):

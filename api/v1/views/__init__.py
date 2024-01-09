@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 """creates an instance of the blue prints called app views"""
+
 from flask import Blueprint
 
 app_views = Blueprint("app_views", __name__, url_prefix='/api/v1')
