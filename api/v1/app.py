@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-'''
-    This module contains variables and methods used to connect to API
-'''
+"""This module contains variables and methods used to connect to API"""
+
 from flask import Flask, Blueprint, jsonify
 from api.v1.views import app_views
 from models import storage
