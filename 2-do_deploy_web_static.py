@@ -1,30 +1,52 @@
 #!/usr/bin/python3
+""" script that generates a .tgz archive from the contents of
+the web_static folder of the AirBnB Clone repo and distributes
+an archive to my web servers using the function do_deploy
 """
-Fabric script based on the file 1-pack_web_static.py that distributes an
-archive to the web servers
-"""
+from fabric.api import local, put, run, env
+from datetime import datetime
+import os
 
-from fabric.api import put, run, env
-from os.path import exists
-env.hosts = ['142.44.167.228', '144.217.246.195']
+
+env.hosts = ['54.86.111.122', '34.228.26.238']
+env.user = 'ubuntu'
+
+
+def do_pack():
+    """ function generates a tgz archive from the contents of
+    the web_static folder of the AirBnB clone
+    """
+    try:
+        my_time = datetime.now().strftime('%Y%m%d%H%M%S')
+        local("mkdir -p versions")
+        my_file = 'versions/web_static_' + my_time + '.tgz'
+        local('tar -vzcf {} web_static'.format(my_file))
+        return (my_file)
+    except:
+        return None
 
 
 def do_deploy(archive_path):
-    """distributes an archive to the web servers"""
-    if exists(archive_path) is False:
+    """ function distrubtes an archive to my web servers
+    """
+    path_existence = os.path.exists(archive_path)
+    if path_existence is False:
         return False
     try:
-        file_n = archive_path.split("/")[-1]
-        no_ext = file_n.split(".")[0]
-        path = "/data/web_static/releases/"
+        path_split = archive_path.replace('/', ' ').replace('.', ' ').split()
+        just_directory = path_split[0]
+        no_tgz_name = path_split[1]
+        full_filename = path_split[1] + '.' + path_split[2]
+        folder = '/data/web_static/releases/{}/'.format(no_tgz_name)
         put(archive_path, '/tmp/')
-        run('mkdir -p {}{}/'.format(path, no_ext))
-        run('tar -xzf /tmp/{} -C {}{}/'.format(file_n, path, no_ext))
-        run('rm /tmp/{}'.format(file_n))
-        run('mv {0}{1}/web_static/* {0}{1}/'.format(path, no_ext))
-        run('rm -rf {}{}/web_static'.format(path, no_ext))
-        run('rm -rf /data/web_static/current')
-        run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
+        run('mkdir -p {}'.format(folder))
+        run('tar -xzf /tmp/{} -C {}/'.format(full_filename, folder))
+        run('rm /tmp/{}'.format(full_filename))
+        run('mv {}/web_static/* {}'.format(folder, folder))
+        run('rm -rf {}/web_static'.format(folder))
+        current = '/data/web_static/current'
+        run('rm -rf {}'.format(current))
+        run('ln -s {}/ {}'.format(folder, current))
         return True
     except:
         return False

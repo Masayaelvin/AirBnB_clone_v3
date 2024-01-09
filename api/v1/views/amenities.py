@@ -1,66 +1,75 @@
 #!/usr/bin/python3
-"""states.py"""
-
+''' blueprint for state '''
 from api.v1.views import app_views
-from flask import abort, jsonify, make_response, request
+from flask import jsonify, abort, request
 from models import storage
-from models.amenity import Amenity
+from models import State
+from models import City
+from models import Amenity
 
 
-@app_views.route('/amenities', methods=['GET'], strict_slashes=False)
-def get_amenities():
-    """get amenity information for all amenities"""
-    amenities = []
-    for amenity in storage.all(Amenity).values():
-        amenities.append(amenity.to_dict())
-    return jsonify(amenities)
+@app_views.route('/amenities/', methods=["GET"], strict_slashes=False)
+@app_views.route('/amenities/<a_id>', methods=["GET"], strict_slashes=False)
+def amenities(a_id=None):
+    ''' retrieves a list of all amenities'''
 
+    if a_id is None:
+        my_amenities = storage.all("Amenity")
+        amenities = [value.to_dict() for key, value in my_amenities.items()]
+        return jsonify(amenities)
 
-@app_views.route('/amenities/<string:amenity_id>', methods=['GET'],
-                 strict_slashes=False)
-def get_amenity(amenity_id):
-    """get amenity information for specified amenity"""
-    amenity = storage.get(Amenity, amenity_id)
-    if amenity is None:
+    amenities = storage.get("Amenity", a_id)
+    if amenities is None:
         abort(404)
-    return jsonify(amenity.to_dict())
+
+    return jsonify(amenities.to_dict())
 
 
-@app_views.route('/amenities/<string:amenity_id>', methods=['DELETE'],
-                 strict_slashes=False)
-def delete_amenity(amenity_id):
-    """deletes an amenity based on its amenity_id"""
-    amenity = storage.get(Amenity, amenity_id)
-    if amenity is None:
+@app_views.route('/amenities/<a_id>', methods=["DELETE"], strict_slashes=False)
+def delete_amenity(a_id):
+    '''Deletes an amenity based on its id'''
+
+    amenities = storage.get("Amenity", a_id)
+    if amenities is None:
         abort(404)
-    amenity.delete()
-    storage.save()
-    return (jsonify({}))
+
+    amenities.delete()
+    return jsonify({})
 
 
-@app_views.route('/amenities', methods=['POST'], strict_slashes=False)
-def post_amenity():
-    """create a new amenity"""
-    if not request.get_json():
-        return make_response(jsonify({'error': 'Not a JSON'}), 400)
-    if 'name' not in request.get_json():
-        return make_response(jsonify({'error': 'Missing name'}), 400)
-    amenity = Amenity(**request.get_json())
-    amenity.save()
-    return make_response(jsonify(amenity.to_dict()), 201)
+@app_views.route('/amenities', methods=["POST"], strict_slashes=False)
+def create_amenity():
+    ''' Creates an Amenity '''
+
+    content = request.get_json()
+    if content is None:
+        return (jsonify({"error": "Not a JSON"}), 400)
+    name = content.get("name")
+    if name is None:
+        return (jsonify({"error": "Missing name"}), 400)
+
+    new_amenity = Amenity()
+    new_amenity.name = name
+    new_amenity.save()
+    return (jsonify(new_amenity.to_dict()), 201)
 
 
-@app_views.route('/amenities/<string:amenity_id>', methods=['PUT'],
-                 strict_slashes=False)
-def put_amenity(amenity_id):
-    """update an amenity"""
-    amenity = storage.get(Amenity, amenity_id)
-    if amenity is None:
+@app_views.route('/amenities/<a_id>', methods=["PUT"], strict_slashes=False)
+def update_amenity(a_id):
+    ''' updates an amenity '''
+
+    content = request.get_json()
+    if content is None:
+        return (jsonify({"error": "Not a JSON"}), 400)
+
+    my_amenity = storage.get("Amenity", a_id)
+    if my_amenity is None:
         abort(404)
-    if not request.get_json():
-        return make_response(jsonify({'error': 'Not a JSON'}), 400)
-    for attr, val in request.get_json().items():
-        if attr not in ['id', 'created_at', 'updated_at']:
-            setattr(amenity, attr, val)
-    amenity.save()
-    return jsonify(amenity.to_dict())
+
+    not_allowed = ["id", "created_at", "updated_at"]
+    for key, value in content.items():
+        if key not in not_allowed:
+            setattr(my_amenity, key, value)
+
+    my_amenity.save()
+    return jsonify(my_amenity.to_dict())
