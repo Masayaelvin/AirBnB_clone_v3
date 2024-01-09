@@ -10,9 +10,7 @@ from models.user import User
 @app_views.route('/users', methods=['GET'],
                  strict_slashes=False)
 def get_all_users():
-    '''
-        Retrieve all user objects
-    '''
+    """RESTful API actions for user object"""
     user_list = []
     users = storage.all(User).values()
     for us in users:
@@ -23,9 +21,7 @@ def get_all_users():
 @app_views.route('/users/<user_id>', methods=['GET'],
                  strict_slashes=False)
 def get_user(user_id):
-    '''
-        Retrieve one user object
-    '''
+    """RESTful API actions for user object"""
     try:
         city = storage.get(User, user_id)
         return jsonify(user.to_dict())
@@ -36,9 +32,7 @@ def get_user(user_id):
 @app_views.route('/users/<user_id>', methods=['DELETE'],
                  strict_slashes=False)
 def delete_user(user_id):
-    '''
-        Delete a User object
-    '''
+    """RESTful API actions for user object"""
     try:
         user = storage.get(User, user_id)
         storate.delete(user)
@@ -50,9 +44,8 @@ def delete_user(user_id):
 @app_views.route('/users', methods=['POST'],
                  strict_slashes=False)
 def post_user():
-    '''
-        Create a user object
-    '''
+    """RESTful API actions for user object"""
+
     if not request.json:
         return jsonify({"error": "Not a JSON"}), 400
     if 'email' not in request.json:
@@ -70,9 +63,7 @@ def post_user():
 @app_views.route('/users/<user_id>', methods=['PUT'],
                  strict_slashes=False)
 def put_user(user_id=None):
-    '''
-        Update a user object
-    '''
+    """RESTful API actions for user object"""
     obj_users = storage.get(User, user_id)
     if obj_user is None:
         abort(404)
